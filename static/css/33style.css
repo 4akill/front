@@ -1,0 +1,275 @@
+/* frontend/templates/style.css */
+
+/* Основные стили */
+body {
+    background: #f8f9fa;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Шапка */
+.header {
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+}
+
+.okulus-logo {
+    max-width: 180px;
+    margin-bottom: 1rem;
+}
+
+/* Фильтры */
+.filters {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .05);
+    margin-bottom: 2rem;
+}
+
+.filter-input {
+    margin-bottom: 1rem;
+}
+
+/* Вкладки */
+.nav-tabs {
+    border-bottom: 2px solid #dee2e6;
+    margin-bottom: 2rem;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    color: #6c757d;
+    padding: 1rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.nav-tabs .nav-link:hover {
+    border: none;
+    color: #1e3a8a;
+}
+
+.nav-tabs .nav-link.active {
+    border: none;
+    color: #1e3a8a;
+    background: none;
+    border-bottom: 2px solid #1e3a8a;
+}
+
+/* Карточки метрик */
+.metric-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .07);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+}
+
+.metric-title {
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.metric-value {
+    color: #1e3a8a;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.metric-subtitle {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+/* Таблицы */
+.table-container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .07);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    font-weight: 600;
+    color: #184c99;
+    border-top: none;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Графики */
+.chart-container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .07);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    height: 400px;
+}
+
+/* Скриншоты */
+.screenshot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.screenshot-card {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+    transition: transform 0.2s;
+}
+
+.screenshot-card:hover {
+    transform: scale(1.02);
+}
+
+.screenshot-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.screenshot-info {
+    padding: 1rem;
+}
+
+.screenshot-time {
+    color: #6c757d;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.screenshot-app {
+    color: #1e3a8a;
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
+/* Бейджи */
+.badge {
+    padding: 0.5em 0.8em;
+    font-weight: 500;
+}
+
+.badge-success {
+    background-color: #28a745;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.badge-danger {
+    background-color: #dc3545;
+}
+
+/* Модальные окна */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+}
+
+.modal-header {
+    border-bottom: 1px solid #dee2e6;
+    padding: 1.5rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+    padding: 1.5rem;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .metric-card {
+        padding: 1rem;
+    }
+
+    .metric-value {
+        font-size: 1.5rem;
+    }
+
+    .chart-container {
+        height: 300px;
+    }
+
+    .screenshot-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Утилиты */
+.text-primary {
+    color: #1e3a8a !important;
+}
+
+.bg-primary {
+    background-color: #1e3a8a !important;
+}
+
+.border-primary {
+    border-color: #1e3a8a !important;
+}
+
+/* Кастомные скроллбары */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1e3a8a;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #152a5f;
+}

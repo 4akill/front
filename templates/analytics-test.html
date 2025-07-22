@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔬 Продвинутая Аналитика - WorkTime Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .control-group input, .control-group select {
+            padding: 8px 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 0.9em;
+            transition: border-color 0.2s;
+        }
+
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .analytics-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            border: 1px solid #e9ecef;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .analytics-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f3f4;
+        }
+
+        .card-header h3 {
+            color: #495057;
+            font-size: 1.2em;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .metric-value.high {
+            color: #dc3545;
+        }
+
+        .metric-value.medium {
+            color: #fd7e14;
+        }
+
+        .metric-value.good {
+            color: #28a745;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .recommendations {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px;
+        }
+
+        .recommendations h3 {
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .recommendation-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            transition: width 0.3s ease;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .quick-stat {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .quick-stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .quick-stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 Продвинутая Аналитика</h1>
+            <p>Комплексный анализ системных метрик, пользовательского взаимодействия и продуктивности</p>
+        </div>
+
+        <div class="controls">
+            <div class="controls-row">
+                <div class="control-group">
+                    <label for="deviceId">🖥️ Устройство:</label>
+                    <select id="deviceId">
+                        <option value="">Все устройства</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="period">⏱️ Период:</label>
+                    <select id="period">
+                        <option value="1h">Последний час</option>
+                        <option value="24h" selected>Последние 24 часа</option>
+                        <option value="7d">Последние 7 дней</option>
+                        <option value="30d">Последние 30 дней</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="startDate">📅 Дата начала:</label>
+                    <input type="datetime-local" id="startDate">
+                </div>
+                <div class="control-group">
+                    <label for="endDate">📅 Дата окончания:</label>
+                    <input type="datetime-local" id="endDate">
+                </div>
+                <button class="btn" onclick="loadAnalytics()">🔄 Обновить</button>
+            </div>
+        </div>
+
+        <div id="content">
+            <div class="loading">🔄 Загрузка аналитики...</div>
+        </div>
+    </div>
+
+    <script>
+        let currentDevices = [];
+
+        // Загрузка списка устройств
+        async function loadDevices() {
+            try {
+                const response = await fetch('/api/devices');
+                const devices = await response.json();
+                currentDevices = devices;
+                
+                const deviceSelect = document.getElementById('deviceId');
+                deviceSelect.innerHTML = '<option value="">Все устройства</option>';
+                
+                devices.forEach(device => {
+                    const option = document.createElement('option');
+                    option.value = device.device_id;
+                    option.textContent = `${device.name || device.device_id} (${device.computer_name || 'Unknown'})`;
+                    deviceSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки устройств:', error);
+            }
+        }
+
+        // Загрузка аналитики
+        async function loadAnalytics() {
+            const content = document.getElementById('content');
+            content.innerHTML = '<div class="loading">🔄 Загрузка аналитики...</div>';
+
+            try {
+                const deviceId = document.getElementById('deviceId').value;
+                const period = document.getElementById('period').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+
+                // Формируем параметры запроса
+                const params = new URLSearchParams();
+                if (deviceId) params.append('device_id', deviceId);
+                if (period) params.append('period', period);
+                if (startDate) params.append('start_date', new Date(startDate).toISOString());
+                if (endDate) params.append('end_date', new Date(endDate).toISOString());
+
+                // Загружаем данные дашборда
+                const response = await fetch(`/api/analytics/dashboard?${params.toString()}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                displayAnalytics(data);
+
+            } catch (error) {
+                console.error('Ошибка загрузки аналитики:', error);
+                content.innerHTML = `
+                    <div class="error">
+                        ❌ Ошибка загрузки аналитики: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Отображение аналитики
+        function displayAnalytics(data) {
+            const content = document.getElementById('content');
+            const analytics = data.analytics;
+            const quickStats = data.quick_stats;
+
+            content.innerHTML = `
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <div class="quick-stat-value">${quickStats.active_devices}</div>
+                        <div class="quick-stat-label">Активных устройств</div>
+                    </div>
+                    <div class="quick-stat">
+                        <div class="quick-stat-value">${quickStats.total_monitoring_points}</div>
+                        <div class="quick-stat-label">Точек данных</div>
+                    </div>
+                    <div class="quick-stat">
+                        <div class="quick-stat-value">${quickStats.system_health}</div>
+                        <div class="quick-stat-label">Состояние системы</div>
+                    </div>
+                    <div class="quick-stat">
+                        <div class="quick-stat-value">${data.period}</div>
+                        <div class="quick-stat-label">Период анализа</div>
+                    </div>
+                </div>
+
+                <div class="analytics-grid">
+                    ${createSystemMetricsCard(analytics.system_metrics)}
+                    ${createUserInteractionCard(analytics.user_interaction)}
+                    ${createProductivityCard(analytics.productivity)}
+                    ${createDeviceInfoCard(analytics.device_info)}
+                </div>
+
+                ${createRecommendationsSection(analytics.recommendations)}
+            `;
+        }
+
+        // Карточка системных метрик
+        function createSystemMetricsCard(metrics) {
+            return `
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <span>🖥️</span>
+                        <h3>Системные метрики</h3>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Средняя загрузка CPU:</span>
+                        <span class="metric-value ${getMetricClass(metrics.avg_cpu_usage, 70, 90)}">${metrics.avg_cpu_usage}%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Максимальная загрузка CPU:</span>
+                        <span class="metric-value ${getMetricClass(metrics.max_cpu_usage, 80, 95)}">${metrics.max_cpu_usage}%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Среднее использование RAM:</span>
+                        <span class="metric-value ${getMetricClass(metrics.avg_memory_usage, 75, 90)}">${metrics.avg_memory_usage}%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Максимальное использование RAM:</span>
+                        <span class="metric-value ${getMetricClass(metrics.max_memory_usage, 85, 95)}">${metrics.max_memory_usage}%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Средняя загрузка GPU:</span>
+                        <span class="metric-value ${getMetricClass(metrics.avg_gpu_usage, 80, 95)}">${metrics.avg_gpu_usage}%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Максимальная загрузка GPU:</span>
+                        <span class="metric-value ${getMetricClass(metrics.max_gpu_usage, 90, 98)}">${metrics.max_gpu_usage}%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Точек данных:</span>
+                        <span class="metric-value">${metrics.total_data_points}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Период (часов):</span>
+                        <span class="metric-value">${metrics.period_hours}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Карточка пользовательского взаимодействия
+        function createUserInteractionCard(interaction) {
+            return `
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <span>🖱️</span>
+                        <h3>Пользовательское взаимодействие</h3>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Всего кликов мыши:</span>
+                        <span class="metric-value">${interaction.total_mouse_clicks}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Всего движений мыши:</span>
+                        <span class="metric-value">${interaction.total_mouse_movements}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Всего нажатий клавиш:</span>
+                        <span class="metric-value">${interaction.total_keyboard_events}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Активность мыши в час:</span>
+                        <span class="metric-value">${interaction.avg_mouse_activity_per_hour}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Активность клавиатуры в час:</span>
+                        <span class="metric-value">${interaction.avg_keyboard_activity_per_hour}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Индекс интенсивности:</span>
+                        <span class="metric-value ${getMetricClass(interaction.interaction_intensity_score, 50, 80)}">${interaction.interaction_intensity_score}/100</span>
+                    </div>
+                    ${createMostActivePeriodsSection(interaction.most_active_periods)}
+                </div>
+            `;
+        }
+
+        // Карточка продуктивности
+        function createProductivityCard(productivity) {
+            return `
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <span>📈</span>
+                        <h3>Продуктивность</h3>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Продуктивное время:</span>
+                        <span class="metric-value">${productivity.productive_time_hours} ч</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Общее рабочее время:</span>
+                        <span class="metric-value">${productivity.total_work_time_hours} ч</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Процент продуктивности:</span>
+                        <span class="metric-value ${getProductivityClass(productivity.productivity_percentage)}">${productivity.productivity_percentage}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${productivity.productivity_percentage}%"></div>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Индекс отвлечений:</span>
+                        <span class="metric-value ${getMetricClass(productivity.distraction_score, 15, 25, true)}">${productivity.distraction_score}%</span>
+                    </div>
+                    ${createTopApplicationsSection(productivity.top_applications)}
+                    ${createTopWebsitesSection(productivity.top_websites)}
+                </div>
+            `;
+        }
+
+        // Карточка информации об устройстве
+        function createDeviceInfoCard(deviceInfo) {
+            return `
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <span>🖥️</span>
+                        <h3>Информация об устройстве</h3>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">ID устройства:</span>
+                        <span class="metric-value">${deviceInfo.device_id}</span>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Имя:</span>
+                        <span class="metric-value">${deviceInfo.name}</span>
+                    </div>
+                    ${deviceInfo.computer_name ? `
+                    <div class="metric-row">
+                        <span class="metric-label">Имя компьютера:</span>
+                        <span class="metric-value">${deviceInfo.computer_name}</span>
+                    </div>
+                    ` : ''}
+                    ${deviceInfo.ip_address ? `
+                    <div class="metric-row">
+                        <span class="metric-label">IP адрес:</span>
+                        <span class="metric-value">${deviceInfo.ip_address}</span>
+                    </div>
+                    ` : ''}
+                    ${deviceInfo.last_seen ? `
+                    <div class="metric-row">
+                        <span class="metric-label">Последняя активность:</span>
+                        <span class="metric-value">${new Date(deviceInfo.last_seen).toLocaleString()}</span>
+                    </div>
+                    ` : ''}
+                    <div class="metric-row">
+                        <span class="metric-label">Статус:</span>
+                        <span class="metric-value ${deviceInfo.is_active ? 'good' : 'high'}">${deviceInfo.is_active ? '🟢 Активно' : '🔴 Неактивно'}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Секция рекомендаций
+        function createRecommendationsSection(recommendations) {
+            return `
+                <div class="recommendations">
+                    <h3>💡 Рекомендации</h3>
+                    ${recommendations.map(rec => `
+                        <div class="recommendation-item">${rec}</div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Секция самых активных периодов
+        function createMostActivePeriodsSection(periods) {
+            if (!periods || periods.length === 0) return '';
+            
+            return `
+                <div style="margin-top: 15px;">
+                    <h4>🔥 Самые активные периоды:</h4>
+                    ${periods.slice(0, 3).map(period => `
+                        <div class="metric-row">
+                            <span class="metric-label">${period.period}:</span>
+                            <span class="metric-value">${period.total_activity} действий</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Секция топ приложений
+        function createTopApplicationsSection(apps) {
+            if (!apps || apps.length === 0) return '';
+            
+            return `
+                <div style="margin-top: 15px;">
+                    <h4>🔝 Топ приложений:</h4>
+                    ${apps.slice(0, 5).map(app => `
+                        <div class="metric-row">
+                            <span class="metric-label">${app.name} ${app.productive ? '✅' : ''}:</span>
+                            <span class="metric-value">${app.time_hours} ч</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Секция топ сайтов
+        function createTopWebsitesSection(websites) {
+            if (!websites || websites.length === 0) return '';
+            
+            return `
+                <div style="margin-top: 15px;">
+                    <h4>🌐 Топ сайтов:</h4>
+                    ${websites.slice(0, 5).map(site => `
+                        <div class="metric-row">
+                            <span class="metric-label">${site.url.substring(0, 30)}... ${site.productive ? '✅' : site.distraction ? '❌' : ''}:</span>
+                            <span class="metric-value">${site.time_hours} ч (${site.visits})</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Функция определения класса метрики
+        function getMetricClass(value, mediumThreshold, highThreshold, inverse = false) {
+            if (inverse) {
+                if (value <= mediumThreshold) return 'good';
+                if (value <= highThreshold) return 'medium';
+                return 'high';
+            } else {
+                if (value <= mediumThreshold) return 'good';
+                if (value <= highThreshold) return 'medium';
+                return 'high';
+            }
+        }
+
+        // Функция определения класса продуктивности
+        function getProductivityClass(value) {
+            if (value >= 70) return 'good';
+            if (value >= 40) return 'medium';
+            return 'high';
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDevices();
+            loadAnalytics();
+            
+            // Автообновление каждые 5 минут
+            setInterval(loadAnalytics, 5 * 60 * 1000);
+        });
+    </script>
+</body>
+</html> 
